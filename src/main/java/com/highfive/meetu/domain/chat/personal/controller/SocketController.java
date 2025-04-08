@@ -36,13 +36,24 @@ public class SocketController {
 
   @MessageMapping("/chat/send")
   public void sendMessage(ChatMessageDTO dto) {
-    // 1. DB 저장
-    ChatMessage savedMessage = chatMessageService.saveMessage(dto);
+    switch (dto.getType()) {
+      case "ENTER":
+        // 입장 메시지 로그 남기기 or 시스템 메시지 생성
+        dto.setMessage(dto.getSenderName() + "님이 입장하셨습니다.");
+        break;
+      case "LEAVE":
+        // 퇴장 메시지
+        dto.setMessage(dto.getSenderName() + "님이 퇴장하셨습니다.");
+        break;
+      case "TALK":
+        // 일반 채팅 메시지 저장
+        chatMessageService.saveMessage(dto);
+        break;
+    }
 
-    // 2. 구독자에게 브로드캐스트
+    // 메시지를 구독자에게 전송
     messagingTemplate.convertAndSend("/sub/chat/" + dto.getRoomId(), dto);
-
-    LOGGER.info("✉️ 메시지 전송됨: roomId={}, senderId={}, content={}",
-        dto.getRoomId(), dto.getSenderId(), dto.getMessage());
   }
+
+
 }

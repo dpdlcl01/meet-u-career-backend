@@ -35,4 +35,6 @@ public class ChatMessageRestController {
     chatMessageService.markAllMessagesAsRead(roomId, accountId);
     return ResponseEntity.ok().build();
   }
+
+
 }
