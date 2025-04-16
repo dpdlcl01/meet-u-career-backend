@@ -5,6 +5,8 @@ import com.highfive.meetu.domain.chat.common.entity.ChatRoom;
 import com.highfive.meetu.domain.chat.common.repository.ChatMessageRepository;
 import com.highfive.meetu.domain.chat.common.repository.ChatRoomRepository;
 import com.highfive.meetu.domain.chat.personal.dto.ChatMessageDTO;
+import com.highfive.meetu.domain.company.common.entity.Company;
+import com.highfive.meetu.domain.company.common.repository.CompanyRepository;
 import com.highfive.meetu.domain.user.common.entity.Account;
 import com.highfive.meetu.domain.user.common.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ChatMessageService {
   private final ChatMessageRepository chatMessageRepository;
   private final ChatRoomRepository chatRoomRepository;
   private final AccountRepository accountRepository;
+  private final CompanyRepository companyRepository;
 
   /**
    * 클라이언트로부터 받은 DTO를 DB에 저장
@@ -75,4 +78,30 @@ public class ChatMessageService {
         .map(ChatMessageDTO::from)
         .collect(Collectors.toList());
   }
+  public void createRoomIfNotExist(ChatMessageDTO dto) {
+    Long roomId = Long.parseLong(dto.getRoomId());
+
+    boolean exists = chatRoomRepository.existsById(roomId);
+    if (!exists) {
+      Company company = companyRepository.findById(dto.getCompanyId())
+          .orElseThrow(() -> new IllegalArgumentException("❌ 회사 없음"));
+
+      Account business = accountRepository.findById(dto.getBusinessAccountId())
+          .orElseThrow(() -> new IllegalArgumentException("❌ 채용 담당자 없음"));
+
+      Account personal = accountRepository.findById(dto.getPersonalAccountId())
+          .orElseThrow(() -> new IllegalArgumentException("❌ 구직자 없음"));
+
+      ChatRoom room = ChatRoom.builder()
+          .company(company)
+          .businessAccount(business)
+          .personalAccount(personal)
+          .status(ChatRoom.Status.OPEN)
+          .build();
+
+      chatRoomRepository.save(room);
+    }
+  }
+
+
 }

@@ -8,9 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * WebSocket 채팅 메시지 DTO
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +20,12 @@ public class ChatMessageDTO {
   private Integer senderType;
   private String message;
   private String type; // "TALK", "ENTER", "LEAVE"
+
+  // 🔽 ChatRoom 생성을 위한 정보들
+  private Long companyId;
+  private Long businessAccountId;
+  private Long personalAccountId;
+  private Long resumeId;
 
   /**
    * DTO → Entity 변환
@@ -47,7 +50,7 @@ public class ChatMessageDTO {
         .senderName(entity.getSender().getName())
         .senderType(entity.getSenderType())
         .message(entity.getMessage())
-        .type("TALK") // 기본은 TALK로 설정 (필요시 조정)
+        .type("TALK") // 기본은 TALK
         .build();
   }
 }
