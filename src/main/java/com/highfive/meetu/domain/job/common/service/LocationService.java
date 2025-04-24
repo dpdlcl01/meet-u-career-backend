@@ -14,19 +14,19 @@ public class LocationService {
 
     private final LocationRepository locationRepository;
 
-    public ResultData<List<LocationOptionDTO>> getProvinceDropdown() {
-        List<LocationOptionDTO> rawList = locationRepository.findProvincesForDropdown();
-
-        // 사용자 친화적 표기 변경
-        List<LocationOptionDTO> refined = rawList.stream()
-                .map(item -> new LocationOptionDTO(
-                        item.getId(),
-                        convertProvinceName(item.getLabel())
-                ))
-                .toList();
-
-        return ResultData.success(refined.size(), refined);
-    }
+//    public ResultData<List<LocationOptionDTO>> getProvinceDropdown() {
+//        List<LocationOptionDTO> rawList = locationRepository.findProvincesForDropdown();
+//
+//        // 사용자 친화적 표기 변경
+//        List<LocationOptionDTO> refined = rawList.stream()
+//                .map(item -> new LocationOptionDTO(
+//                        item.getId(),
+//                        convertProvinceName(item.getLabel())
+//                ))
+//                .toList();
+//
+//        return ResultData.success(refined.size(), refined);
+//    }
 
     private String convertProvinceName(String original) {
         return switch (original) {

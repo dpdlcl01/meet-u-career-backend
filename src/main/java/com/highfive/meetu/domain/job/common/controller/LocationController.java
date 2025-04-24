@@ -20,9 +20,9 @@ public class LocationController {
     /**
      * 1단계 지역 드롭다운 (도/특별시/광역시 등)
      */
-    @GetMapping("/provinces")
-    public ResultData<List<LocationOptionDTO>> getProvinces() {
-        return locationService.getProvinceDropdown();
-    }
+//    @GetMapping("/provinces")
+//    public ResultData<List<LocationOptionDTO>> getProvinces() {
+//        return locationService.getProvinceDropdown();
+//    }
 
 }
