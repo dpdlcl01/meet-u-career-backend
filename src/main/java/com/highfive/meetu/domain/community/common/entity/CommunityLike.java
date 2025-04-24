@@ -7,21 +7,21 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 게시글 좋아요 엔티티
+ * 커뮤니티 게시글 좋아요 엔티티
  *
  * 연관관계:
- * - Account(1) : CommunityLike(N) - CommunityLike가 주인, @JoinColumn 사용
- * - CommunityPost(1) : CommunityLike(N) - CommunityLike가 주인, @JoinColumn 사용
+ * - Account(1) : CommunityLike(N) (CommunityLike가 주인)
+ * - CommunityPost(1) : CommunityLike(N) (CommunityLike가 주인)
  */
 @Entity(name = "communityLike")
 @Table(
-        indexes = {
-                @Index(name = "idx_like_accountId", columnList = "accountId"),
-                @Index(name = "idx_like_postId", columnList = "postId")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_account_post", columnNames = {"accountId", "postId"})
-        }
+    indexes = {
+        @Index(name = "idx_like_accountId", columnList = "accountId"),
+        @Index(name = "idx_like_postId", columnList = "postId")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_account_post", columnNames = {"accountId", "postId"})
+    }
 )
 @Getter
 @Setter
@@ -31,11 +31,13 @@ import lombok.experimental.SuperBuilder;
 @ToString(exclude = {"account", "post"})
 public class CommunityLike extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "accountId", nullable = false)
-    private Account account;  // 좋아요를 누른 사용자
+  // 좋아요를 누른 사용자 (Account와 N:1)
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "accountId", nullable = false)
+  private Account account;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "postId")
-    private CommunityPost post;  // 좋아요를 누른 게시글
+  // 좋아요를 누른 게시글 (CommunityPost와 N:1)
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "postId", nullable = false) // 🔥 명시적으로 추가
+  private CommunityPost post;
 }

@@ -33,7 +33,7 @@ public class CompanyBlock extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profileId", nullable = false)
-    private Profile profile;  // 차단한 구직자 프로필
+    private Profile profile;  // 차단을 설정한 구직자의 프로필 ID
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "companyId", nullable = false)

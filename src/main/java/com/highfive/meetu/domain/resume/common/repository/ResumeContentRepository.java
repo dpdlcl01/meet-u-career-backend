@@ -11,8 +11,6 @@ import java.util.List;
 
 @Repository
 public interface ResumeContentRepository extends JpaRepository<ResumeContent, Long> {
-
-
     void deleteAllByResumeId(Long resumeId);
 
     @Modifying
@@ -20,4 +18,7 @@ public interface ResumeContentRepository extends JpaRepository<ResumeContent, Lo
     void deleteByResumeId(@Param("resumeId") Long resumeId);
 
 
+
+    @Query("SELECT rc.field FROM resumeContent rc JOIN rc.resume r WHERE r.profile.id = :userId GROUP BY rc.field ORDER BY COUNT(rc.id) DESC")
+    List<String> findTop3KeywordsByUserId(@Param("userId") Long userId);
 }

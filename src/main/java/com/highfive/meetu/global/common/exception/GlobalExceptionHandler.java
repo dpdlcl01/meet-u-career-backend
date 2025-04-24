@@ -29,4 +29,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ResultData.fail("서버 오류가 발생했습니다."));
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ResultData<Void>> handleIllegalStateException(IllegalStateException e) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ResultData.fail(e.getMessage()));
+    }
 }

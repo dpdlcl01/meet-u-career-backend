@@ -1,11 +1,14 @@
 package com.highfive.meetu.domain.resume.personal.controller;
 
+import com.highfive.meetu.domain.application.personal.service.ApplicationPersonalService;
+import com.highfive.meetu.domain.resume.personal.dto.ResumePersonalDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.highfive.meetu.domain.resume.personal.dto.*;
 import com.highfive.meetu.domain.resume.personal.service.ResumePersonalService;
 import com.highfive.meetu.global.common.exception.BadRequestException;
 import com.highfive.meetu.global.common.response.ResultData;
+import com.highfive.meetu.infra.oauth.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,7 @@ import java.util.Map;
 public class ResumePersonalController {
 
     private final ResumePersonalService resumePersonalService;
+    private final ApplicationPersonalService applicationPersonalService;
     private final ObjectMapper objectMapper;
 
 //    // 이력서 초기 생성 메서드 - "이력서 작성" 버튼을 눌러서 이력서 작성 페이지로 넘어갈 때 데이터 생성
@@ -251,6 +255,28 @@ public class ResumePersonalController {
         return ResultData.success(1, "대표 이력서로 설정되었습니다.");
     }
 
+    /**
+     * 이력서 목록 조회
+     */
+//    @GetMapping("/list")
+//    public ResultData<List<ResumePersonalDTO>> getMyResumeList() {
+//        Long profileId = SecurityUtil.getProfileId();
+//        List<ResumePersonalDTO> resumeList = resumePersonalService.getResumeListByProfileId(profileId);
+//        return ResultData.success(resumeList.size(), resumeList);
+//    }
+
+    /**
+     * 입사 지원
+     * @param jobPostingId 채용 공고 ID
+     * @param resumeId 이력서 ID
+     * @return 결과 메시지
+     */
+    @PostMapping("/apply")
+    public ResultData<?> applyForJob(@RequestParam Long jobPostingId, @RequestParam Long resumeId) {
+        Long profileId = SecurityUtil.getProfileId();  // 로그인한 사용자의 프로필 ID 가져오기
+        applicationPersonalService.applyForJob(profileId, jobPostingId, resumeId);
+        return ResultData.success(1, "입사 지원이 완료되었습니다.");
+    }
     // 이력서 파일 다운로드 Presigned URL 발급
     @GetMapping("/{resumeId}/file-url")
     public ResultData<String> getResumeFileDownloadUrl(@PathVariable Long resumeId) {
@@ -265,12 +291,6 @@ public class ResumePersonalController {
         return ResultData.success(1, null);
     }
 
-//    // 이력서 복제 기능 (복사본 생성)
-//    @PostMapping("/{resumeId}/duplicate")
-//    public ResultData<Long> duplicateResume(@PathVariable Long resumeId) {
-//        Long newResumeId = resumePersonalService.duplicateResume(resumeId);
-//        return ResultData.success(1, newResumeId);
-//    }
 
 
 //    // 이력서 상태 변경

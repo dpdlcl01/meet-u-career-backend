@@ -9,3 +9,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 custom:
   fileDirPath: /usr/work  # 애플리케이션에서 사용하는 파일 저장 경로 (파일 업로드 등 관련 경로 설정)
+
+jwt: # token
+  cookie-secure: false
