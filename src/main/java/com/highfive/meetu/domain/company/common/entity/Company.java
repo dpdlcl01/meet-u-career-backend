@@ -39,10 +39,13 @@ import java.util.List;
 public class Company extends BaseEntity {
 
     @Column(length = 255, nullable = false)
-    private String name;  // 회사명
+    private String name;  // 회사명`
 
     @Column(length = 20, nullable = false, unique = true)
     private String businessNumber;  // 사업자등록번호
+
+    @Column(length = 50)
+    private String companyType;   // 기업 형태 (대기업, 벤처 등)
 
     @Column(length = 100)
     private String representativeName;
@@ -60,11 +63,20 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private Long revenue;  // 매출액
 
+    @Column(name = "operatingProfit")
+    private Long operatingProfit;        // 영업이익
+
     @Column(length = 500, nullable = false)
     private String website;  // 회사 웹사이트 URL
 
     @Column(length = 500)
     private String logoKey;  // 기업 로고 이미지 URL
+
+    @Column(length = 255)
+    private String logoUrl;              // 로고 URL (선택)
+
+    @Column(length = 50)
+    private String corpCode;             // API 연동 기업 코드
 
     @Column(length = 500, nullable = false)
     private String address;  // 회사 주소
@@ -74,7 +86,7 @@ public class Company extends BaseEntity {
     private LocalDateTime updatedAt;  // 기업 정보 수정일
 
     @Column(nullable = false)
-    private Integer status;  // 기업 상태 (ACTIVE, INACTIVE)
+    private Integer status;  // 기업 상태 (0: ACTIVE, 1: INACTIVE)
 
     @BatchSize(size = 20)
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
