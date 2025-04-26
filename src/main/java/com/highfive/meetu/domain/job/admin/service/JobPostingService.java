@@ -44,7 +44,7 @@ public class JobPostingService {
     // 사람인 API를 통해 채용공고 데이터를 가져와 DB에 저장
     public void updateJobPostings() {
         try {
-            String keyword = "서비스업"; // 테스트용 키워드
+            String keyword = "웹"; // 테스트용 키워드
             String encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8);
             String apiUrl = "https://oapi.saramin.co.kr/job-search?access-key=" + saraminKey
                     + "&keywords=" + encodedKeyword
@@ -135,12 +135,8 @@ public class JobPostingService {
     public Company callCompanyInfo(String companyName, String industry) {
         String normalizedName = normalizeCompanyName(companyName);
 
-        Optional<Company> existingCompany = companyRepository.findByName(normalizedName);
-        if (existingCompany.isPresent()) {
-            return existingCompany.get();
-        }
-
         try {
+            // 금융위 API 호출 준비
             String encodedName = URLEncoder.encode(normalizedName, StandardCharsets.UTF_8);
             String financeApiUrl = "https://apis.data.go.kr/1160100/service/GetCorpBasicInfoService_V2/getCorpOutline_V2"
                     + "?serviceKey=" + financeKey
@@ -165,26 +161,42 @@ public class JobPostingService {
             if (items.isArray() && items.size() > 0) {
                 JsonNode firstItem = items.get(0);
 
+                // 사업자번호 가져오기
                 String bzno = firstItem.path("bzno").asText();
-                bzno = (bzno == null || bzno.isBlank()) ? null : bzno;  // **여기 추가**
+                bzno = (bzno == null || bzno.isBlank()) ? null : bzno;
 
-                String estbDt = firstItem.path("enpEstbDt").asText();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-                LocalDate foundedDate;
-                if (estbDt == null || estbDt.isEmpty()) {
-                    foundedDate = LocalDate.now();
-                } else {
-                    foundedDate = LocalDate.parse(estbDt, formatter);
+                //  사업자번호가 없으면 저장 안 함
+                if (bzno == null) {
+                    return null;
                 }
 
+                // 사업자번호로 먼저 중복 체크
+                Optional<Company> companyByBizNum = companyRepository.findByBusinessNumber(bzno);
+                if (companyByBizNum.isPresent()) {
+                    return companyByBizNum.get();
+                }
+
+                // 이름으로도 중복 체크
+                Optional<Company> existingCompany = companyRepository.findByName(normalizedName);
+                if (existingCompany.isPresent()) {
+                    return existingCompany.get();
+                }
+
+                // 설립일 처리
+                String estbDt = firstItem.path("enpEstbDt").asText();
+                LocalDate foundedDate = (estbDt == null || estbDt.isEmpty())
+                        ? LocalDate.now()
+                        : LocalDate.parse(estbDt, DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+                // 새 회사 저장
                 Company newCompany = Company.builder()
                         .name(firstItem.path("corpNm").asText())
-                        .businessNumber(bzno)  // **여기도 수정된 bzno 사용**
+                        .businessNumber(bzno)
                         .representativeName(firstItem.path("enpRprFnm").asText())
                         .industry(industry)
                         .foundedDate(foundedDate)
                         .numEmployees(firstItem.path("enpEmpeCnt").asInt())
-                        .revenue(0L)
+                        .revenue(0L) // 기본값 0
                         .website(firstItem.path("enpHmpgUrl").asText())
                         .logoKey(null)
                         .address(firstItem.path("enpBsadr").asText())
@@ -192,8 +204,7 @@ public class JobPostingService {
                         .status(Company.Status.ACTIVE)
                         .build();
 
-                Company savedCompany = companyRepository.save(newCompany);
-                return savedCompany;
+                return companyRepository.save(newCompany);
             } else {
                 return null;
             }
@@ -202,6 +213,8 @@ public class JobPostingService {
             return null;
         }
     }
+
+
 
 
     // 기업명에서 "(주)"나 "㈜" 등의 문자열을 제거하고 공백을 트림하여 정규화합니다.
