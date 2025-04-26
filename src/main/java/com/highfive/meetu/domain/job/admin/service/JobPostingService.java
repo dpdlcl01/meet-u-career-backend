@@ -44,7 +44,7 @@ public class JobPostingService {
     // 사람인 API를 통해 채용공고 데이터를 가져와 DB에 저장
     public void updateJobPostings() {
         try {
-            String keyword = "개발"; // 테스트용 키워드
+            String keyword = "서비스업"; // 테스트용 키워드
             String encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8);
             String apiUrl = "https://oapi.saramin.co.kr/job-search?access-key=" + saraminKey
                     + "&keywords=" + encodedKeyword
@@ -123,7 +123,7 @@ public class JobPostingService {
                         .build();
 
                 jobPostingRepo.save(posting);
-                System.out.println("공고 저장 완료 - 사람인 API 요청 URL: " + apiUrl);
+//                System.out.println("공고 저장 완료 - 사람인 API 요청 URL: " + apiUrl);
             }
         } catch (Exception e) {
             System.out.println("updateJobPostings 예외 발생: " + e.getMessage());
@@ -134,11 +134,9 @@ public class JobPostingService {
     // 금융위원회 기업정보 API를 호출해서 기업 정보를 저장 및 반환하는 함수
     public Company callCompanyInfo(String companyName, String industry) {
         String normalizedName = normalizeCompanyName(companyName);
-//        System.out.println("정규화된 기업명: " + normalizedName);
 
         Optional<Company> existingCompany = companyRepository.findByName(normalizedName);
         if (existingCompany.isPresent()) {
-//            System.out.println("이미 존재하는 기업: " + normalizedName);
             return existingCompany.get();
         }
 
@@ -148,8 +146,6 @@ public class JobPostingService {
                     + "?serviceKey=" + financeKey
                     + "&pageNo=1&numOfRows=1&resultType=json"
                     + "&corpNm=" + encodedName;
-
-//            System.out.println("금융위원회 API 요청 URL: " + financeApiUrl);
 
             URL url = new URL(financeApiUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -163,21 +159,19 @@ public class JobPostingService {
             }
             br.close();
 
-//            System.out.println("금융위원회 API 응답: " + response.toString());
-
             JsonNode root = objectMapper.readTree(response.toString());
             JsonNode items = root.path("response").path("body").path("items").path("item");
 
             if (items.isArray() && items.size() > 0) {
                 JsonNode firstItem = items.get(0);
-//                System.out.println("금융위 응답 내 기업명: " + firstItem.path("corpNm").asText());
 
-                // 설립일 파싱: 값이 비어있으면 기본값(LocalDate.now())을 사용합니다.
+                String bzno = firstItem.path("bzno").asText();
+                bzno = (bzno == null || bzno.isBlank()) ? null : bzno;  // **여기 추가**
+
                 String estbDt = firstItem.path("enpEstbDt").asText();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                 LocalDate foundedDate;
                 if (estbDt == null || estbDt.isEmpty()) {
-//                    System.out.println("설립일 정보가 없어 기본값(LocalDate.now())을 사용합니다.");
                     foundedDate = LocalDate.now();
                 } else {
                     foundedDate = LocalDate.parse(estbDt, formatter);
@@ -185,7 +179,7 @@ public class JobPostingService {
 
                 Company newCompany = Company.builder()
                         .name(firstItem.path("corpNm").asText())
-                        .businessNumber(firstItem.path("bzno").asText())
+                        .businessNumber(bzno)  // **여기도 수정된 bzno 사용**
                         .representativeName(firstItem.path("enpRprFnm").asText())
                         .industry(industry)
                         .foundedDate(foundedDate)
@@ -199,18 +193,16 @@ public class JobPostingService {
                         .build();
 
                 Company savedCompany = companyRepository.save(newCompany);
-//                System.out.println("새로운 회사 저장 완료: " + savedCompany.getName());
                 return savedCompany;
             } else {
-//                System.out.println("금융위원회 API에 해당 기업 정보 없음: " + normalizedName);
                 return null;
             }
         } catch (Exception e) {
-//            System.out.println("금융위원회 API 호출 오류: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
+
 
     // 기업명에서 "(주)"나 "㈜" 등의 문자열을 제거하고 공백을 트림하여 정규화합니다.
     private String normalizeCompanyName(String companyName) {
