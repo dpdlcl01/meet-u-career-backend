@@ -41,7 +41,7 @@ public class CalendarEvent extends BaseEntity {
     private Company company;  // 일정이 속한 기업 (NULL 가능)
 
     @Column(nullable = false)
-    private Integer eventType;  // 일정 유형 (1:면접, 2:지원마감, 3:북마크마감, 4:기업이벤트, 5:개인일정)
+    private Integer eventType;  // 일정 유형 (1:지원 마감, 2:북마크 마감, 3:관심기업 공고 일정, 4:개인일정)
 
     @Column(length = 255, nullable = false)
     private String title;  // 일정 제목
@@ -67,11 +67,10 @@ public class CalendarEvent extends BaseEntity {
 
     // 이벤트 유형 상수
     public static class EventType {
-        public static final int INTERVIEW = 1;              // 면접 일정
-        public static final int APPLICATION_DEADLINE = 2;   // 지원 마감
-        public static final int BOOKMARK_DEADLINE = 3;      // 스크랩 마감
-        public static final int COMPANY_EVENT = 4;          // 기업 행사
-        public static final int PERSONAL_EVENT = 5;         // 사용자 개인 일정
+        public static final int APPLICATION_DEADLINE = 1;   // 지원 마감
+        public static final int BOOKMARK_DEADLINE = 2;      // 북마크 마감
+        public static final int COMPANY_EVENT = 3;          // 관심기업 공고 일정
+        public static final int PERSONAL_EVENT = 4;         // 개인 커스텀 일정
     }
 
 }

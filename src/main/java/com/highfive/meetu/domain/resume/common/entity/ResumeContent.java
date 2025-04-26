@@ -76,10 +76,14 @@ public class ResumeContent extends BaseEntity {
      * 항목 구분
      */
     public static class SectionType {
-        public static final int EDUCATION = 0;      // 학력
-        public static final int EXPERIENCE = 1;     // 경력
-        public static final int CERTIFICATION = 2;  // 자격증
-        public static final int ACTIVITY = 3;       // 대외활동
+        public static final int EDUCATION = 0;       // 학력 사항
+        public static final int EXPERIENCE = 1;      // 경력 사항
+        public static final int CERTIFICATION = 2;   // 외국어/자격증/수상
+        public static final int ACTIVITY = 3;        // 활동/경험/교육
+        public static final int PORTFOLIO = 4;       // 포트폴리오
+        public static final int COVER_LETTER = 5;    // 자기소개서
+        public static final int CUSTOM = 6;          // 사용자 정의 항목
     }
+
 
 }

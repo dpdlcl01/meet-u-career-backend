@@ -2,6 +2,7 @@ package com.highfive.meetu.domain.resume.common.repository;
 
 import com.highfive.meetu.domain.resume.common.entity.Resume;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -36,6 +37,13 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
      */
     @Query("SELECT r FROM resume r JOIN FETCH r.resumeContentList WHERE r.id = :resumeId")
     Optional<Resume> findWithContentsById(@Param("resumeId") Long resumeId);
+
+
+
+    // ----------------------------------
+    @Modifying
+    @Query("UPDATE resume r SET r.isPrimary = false WHERE r.profile.id = :profileId AND r.status <> 3")
+    void clearPrimaryResume(@Param("profileId") Long profileId);
 
 
 

@@ -2,6 +2,10 @@ spring:
   profiles:
     active: dev            # 현재 사용할 프로파일 설정 (application-dev.yml 파일 사용)
     include: secret        # 민감 정보가 담긴 application-secret.yml 포함
+  servlet:
+    multipart:
+      max-file-size: 10MB     # 파일 하나의 최대 용량
+      max-request-size: 10MB  # 전체 요청의 최대 용량
 
   jpa:
     hibernate:
@@ -16,6 +20,41 @@ spring:
         format_sql: true       # SQL을 보기 좋게 정렬
         use_sql_comments: true # SQL에 주석을 추가하여 JPA 동작 설명
 
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: legenprimo@gmail.com
+    password: ytde oqba rvoj tupe
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+      auth-code-expiration-millis: 600000  # 10 * 60 * 1000(밀리초) == 10분
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  override-with-generic-response: false
+
 logging:
   level:
     root: INFO               # 전체 로그 레벨 설정 (DEBUG, INFO, WARN, ERROR 등)
+
+api:
+  jwt:
+    secret: meetu-super-secret-key-2025-change-to-something-longer-very-safe
+    access-token-expiration: 3600000
+    refresh-token-expiration: 604800000
+    passwordReset:
+      expiration: 600000
+

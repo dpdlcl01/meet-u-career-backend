@@ -41,5 +41,8 @@ public class ResultData<T> {
         return of(0, msg, null);
     }
 
-
+    // 공통 에러코드를 받아서 실패 응답 생성
+    public static <T> ResultData<T> fail(ErrorCode errorCode) {
+        return new ResultData<>(0, errorCode.getMessage(), null);
+    }
 }

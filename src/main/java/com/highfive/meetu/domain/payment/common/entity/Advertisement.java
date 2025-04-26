@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * 연관관계:
  * - JobPosting(1) : Advertisement(N) - Advertisement가 주인, @JoinColumn 사용
  * - Company(1) : Advertisement(N) - Advertisement가 주인, @JoinColumn 사용
- * - Payment(1) : Advertisement(N) - Advertisement가 주인, @JoinColumn 사용
+ * - Advertisement(1) : Payment(1) - 단방향 1:1 관계, Advertisement가 주인
  */
 @Entity(name = "advertisement")
 @Table(
@@ -58,8 +58,8 @@ public class Advertisement extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime endDate;  // 광고 종료 날짜
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "paymentId")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paymentId", unique = true)
     private Payment payment;  // 광고 결제 (NULL 가능)
 
     /**

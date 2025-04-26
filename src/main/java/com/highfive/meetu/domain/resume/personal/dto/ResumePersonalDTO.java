@@ -47,6 +47,8 @@ public class ResumePersonalDTO {
     // 프로필 정보
     private Long profileId;             // 프로필 ID
 
+    private Boolean isPrimary;  // 대표 이력서 여부
+
     // 이력서 항목 리스트
     private List<ResumeContentPersonalDTO> contents;
 
@@ -64,6 +66,7 @@ public class ResumePersonalDTO {
                 .extraLink1(this.extraLink1)
                 .extraLink2(this.extraLink2)
                 .status(this.status != null ? this.status : 1) // 기본값: 임시저장(1)
+                .isPrimary(this.isPrimary != null ? this.isPrimary : false)
                 .profile(profile)
                 .coverLetter(coverLetter)
                 .build();
@@ -82,6 +85,7 @@ public class ResumePersonalDTO {
                 .resumeType(resume.getResumeType())
                 .extraLink1(resume.getExtraLink1())
                 .extraLink2(resume.getExtraLink2())
+                .isPrimary(resume.getIsPrimary())
                 .status(resume.getStatus())
                 .createdAt(resume.getCreatedAt())
                 .updatedAt(resume.getUpdatedAt())
@@ -99,6 +103,7 @@ public class ResumePersonalDTO {
                 .title(resume.getTitle())
                 .updatedAt(resume.getUpdatedAt())
                 .createdAt(resume.getCreatedAt())
+                .isPrimary(resume.getIsPrimary())
                 .status(resume.getStatus())
                 .resumeType(resume.getResumeType())
                 .profileId(resume.getProfile().getId())

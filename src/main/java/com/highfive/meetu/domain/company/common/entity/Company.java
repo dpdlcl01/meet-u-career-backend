@@ -1,7 +1,6 @@
 package com.highfive.meetu.domain.company.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import com.highfive.meetu.domain.job.common.entity.JobPosting;
 import com.highfive.meetu.domain.user.common.entity.Account;
 import com.highfive.meetu.global.common.entity.BaseEntity;
@@ -67,6 +66,15 @@ public class Company extends BaseEntity {
 
     @Column(length = 500)
     private String address;  // 회사 주소
+
+    @Column(length = 50)
+    private String companyType;  // 기업 형태 (예: 대기업 등)
+
+    @Column(length = 50)
+    private String corpcode;  // API 연동용 기업 코드
+
+    @Column
+    private Long operatingProfit;  // 최근 연도 영업이익
 
     @LastModifiedDate
     @Column(nullable = false)

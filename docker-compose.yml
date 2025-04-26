@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   backend:
     build:
@@ -8,13 +10,63 @@ services:
       - meetu_net
     ports:
       - "8080:8080"
-    env_file: .env
+    env_file: ./.env  # 명확하게 경로 지정
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=${JPA_HIBERNATE_DDL_AUTO}
+      - AI_SERVICE_URL=http://ai-service:8000  # 서비스 이름으로 참조 (권장)
+      - SPRING_REDIS_HOST=redis  # Redis 서비스 이름으로 참조
+      - SPRING_REDIS_PORT=6379
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - ai-service
+      - redis
     restart: always
+
+  ai-service:
+    build:
+      context: ../meet-u-career-ai
+      dockerfile: Dockerfile
+    container_name: meet-u-career-ai
+    networks:
+      - meetu_net
+    expose:
+      - "8000"  # 내부 네트워크에서만 접근 가능
+    restart: always
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  redis:
+    image: redis:alpine
+    container_name: meet-u-redis
+    networks:
+      - meetu_net
+    volumes:
+      - redis-data:/data
+    restart: always
+    command: redis-server --appendonly yes  # 데이터 지속성 활성화
+
+  nginx:
+    image: nginx:alpine
+    container_name: meet-u-nginx
+    networks:
+      - meetu_net
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ./nginx/www:/var/www/html
+    depends_on:
+      - backend
+    restart: always
+
 networks:
   meetu_net:
     driver: bridge
+
+volumes:
+  redis-data:  # Redis 데이터 영속성을 위한 볼륨

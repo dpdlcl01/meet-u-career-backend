@@ -57,10 +57,12 @@ public class CommunityPost extends BaseEntity {
     private String postImageKey;  // S3에 저장된 대표 이미지 파일의 Key (예: communityPost/post123_abc.jpg)
 
     @Column(nullable = false)
-    private Integer likeCount;  // 좋아요 수
+    @Builder.Default
+    private Integer likeCount = 0;  // 좋아요 수
 
     @Column(nullable = false)
-    private Integer commentCount;  // 댓글 수
+    @Builder.Default
+    private Integer commentCount = 0;  // 댓글 수
 
     @Column(nullable = false)
     private Integer status;  // 게시글 상태 (ACTIVE, DELETED)

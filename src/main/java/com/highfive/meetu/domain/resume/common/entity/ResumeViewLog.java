@@ -49,6 +49,7 @@ public class ResumeViewLog extends BaseEntity {
     @Column(nullable = false)
     private Boolean isNotified;  // 열람 알림 여부
 
+
     /**
      * 열람 유형
      */

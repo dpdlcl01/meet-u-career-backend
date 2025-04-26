@@ -22,7 +22,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @ToString
 public class Admin extends BaseEntity {
-
     @Column(length = 255, nullable = false, unique = true)
     private String email;  // 관리자 이메일 (로그인 ID)
 

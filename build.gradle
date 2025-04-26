@@ -1,3 +1,4 @@
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.4'
@@ -29,6 +30,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // ✅ Spring Boot Starter
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'      // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-web'           // 웹 MVC
+    implementation 'org.springframework.boot:spring-boot-starter-security'      // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-validation'    // Bean Validation
+
+    // ✅ STOMP WebSocket 채팅 기능 추가
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'     // << 이거 추가됨
+    // AWS S3
+    implementation 'software.amazon.awssdk:s3:2.20.91' // 최신 AWS SDK v2
+    implementation 'software.amazon.awssdk:auth'
 
     // STOMP WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
@@ -36,17 +48,23 @@ dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    // ✅ Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-    // 개발 도구
+    // ✅ 개발 도구
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // DB 드라이버
     runtimeOnly 'com.mysql:mysql-connector-j'
+    // ✅ MySQL
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-    // Spring Configuration Processor
+    // ✅ Spring Configuration Processor
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     // 테스트
+    // ✅ 테스트
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -55,12 +73,50 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    // ✅ JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    // JWT 관련 의존성
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'  // JWT API
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'  // JWT 구현체
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'  // Jackson을 통한 JWT 직렬화/역직렬화
 
     // QueryDSL
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    // ✅ QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    // QueryDSL 관련 의존성
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'  // QueryDSL JPA
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"  // QueryDSL APT
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"  // Jakarta Annotation API
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"  // Jakarta Persistence API
+
+
+    // SMTP 관련 의존성(email)
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // WebClient 관련 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-webflux' // For WebClient and reactive support
+
+    // Swagger 관련 의존성
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+    // Google
+    implementation 'com.google.api-client:google-api-client:2.2.0'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.34.1'
+    implementation 'com.google.http-client:google-http-client-gson:1.43.3'
+    implementation 'com.google.http-client:google-http-client-jackson2:1.43.3'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 }
 
 tasks.named('test') {
