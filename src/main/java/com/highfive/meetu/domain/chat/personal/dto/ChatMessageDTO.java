@@ -27,6 +27,8 @@ public class ChatMessageDTO {
   private Long personalAccountId;
   private Long resumeId;
 
+  private Integer isRead; // ✅ 추가
+
   /**
    * DTO → Entity 변환
    */
@@ -51,6 +53,7 @@ public class ChatMessageDTO {
         .senderType(entity.getSenderType())
         .message(entity.getMessage())
         .type("TALK") // 기본은 TALK
+        .isRead(entity.getIsRead()) // ✅ 추가
         .build();
   }
 }

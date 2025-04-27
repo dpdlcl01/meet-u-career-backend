@@ -4,52 +4,41 @@ import com.highfive.meetu.domain.chat.personal.dto.ChatMessageDTO;
 import com.highfive.meetu.domain.chat.personal.dto.ChatRoomDTO;
 import com.highfive.meetu.domain.chat.personal.service.ChatMessageService;
 import com.highfive.meetu.domain.chat.personal.service.ChatRoomService;
+import com.highfive.meetu.global.common.response.ResultData;
+import com.highfive.meetu.infra.oauth.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
+@RequestMapping("/api/chat")
 @RequiredArgsConstructor
-public class SocketController {
+public class ChatController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SocketController.class);
-
-  private final SimpMessageSendingOperations messagingTemplate;
-  private final ChatMessageService chatMessageService;
   private final ChatRoomService chatRoomService;
+  private final ChatMessageService chatMessageService;
+  private final SimpMessageSendingOperations messagingTemplate;
 
   /**
-   * WebSocket 연결 감지 (클라이언트가 소켓 연결 시)
+   * 🔥 내 채팅방 목록 조회 (accountId 기준)
    */
-  @EventListener
-  public void handleWebSocketConnectListener(SessionConnectEvent event) {
-    LOGGER.info("📡 WebSocket 연결 감지됨");
+  @GetMapping("/rooms")
+  public ResultData<List<ChatRoomDTO>> getMyChatRooms() {
+    Long accountId = SecurityUtil.getAccountId();
+    List<ChatRoomDTO> rooms = chatRoomService.findMyChatRooms(accountId);
+    return ResultData.success(rooms.size(), rooms);
   }
 
   /**
-   * WebSocket 연결 종료 감지 (클라이언트가 소켓 종료 시)
-   */
-  @EventListener
-  public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-    StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-    LOGGER.info("📴 연결 종료됨 - sessionId={}", accessor.getSessionId());
-  }
-
-  /**
-   * 클라이언트로부터 채팅 메시지를 수신하면 처리하는 메서드
+   * 🔥 클라이언트로부터 채팅 메시지를 수신하면 채팅방 생성 및 메시지 처리
    */
   @MessageMapping("/chat/send")
   public void sendMessage(ChatMessageDTO dto) {
-
     // ✅ 채팅방이 존재하지 않으면 생성
-    ChatRoomDTO chatRoomDTO = ChatRoomDTO.from(dto);
+    ChatRoomDTO chatRoomDTO = ChatRoomDTO.fromMessageDTO(dto);
     chatRoomService.findOrCreateRoom(chatRoomDTO);
 
     // 💬 메시지 타입 분기 처리

@@ -1,48 +1,48 @@
 package com.highfive.meetu.domain.chat.personal.dto;
 
 import com.highfive.meetu.domain.chat.common.entity.ChatRoom;
-import com.highfive.meetu.domain.company.common.entity.Company;
-import com.highfive.meetu.domain.resume.common.entity.Resume;
-import com.highfive.meetu.domain.user.common.entity.Account;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
- * 채팅방 생성을 위한 DTO
- * - ChatMessageDTO로부터 필요한 정보만 분리해 사용
- * - toEntity 메서드로 실제 ChatRoom 엔티티 변환 가능
+ * 🔥 채팅방 조회용 DTO
  */
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ChatRoomDTO {
 
-  private Long companyId;
-  private Long businessAccountId;
-  private Long personalAccountId;
-  private Long resumeId; // optional
+  private Long id;                 // 채팅방 ID
+  private Long companyId;           // 기업 ID
+  private Long businessAccountId;   // 기업 계정 ID
+  private Long personalAccountId;   // 개인 계정 ID
+  private int unreadCount;          // 안 읽은 메시지 수
 
   /**
-   * ChatMessageDTO → ChatRoomDTO 변환
+   * ChatRoom 엔티티를 DTO로 변환 + 안읽은 메시지 수 포함
    */
-  public static ChatRoomDTO from(ChatMessageDTO dto) {
+  public static ChatRoomDTO from(ChatRoom chatRoom, int unreadCount) {
     return ChatRoomDTO.builder()
-        .companyId(dto.getCompanyId())
-        .businessAccountId(dto.getBusinessAccountId())
-        .personalAccountId(dto.getPersonalAccountId())
-        .resumeId(dto.getResumeId())
+        .id(chatRoom.getId())
+        .companyId(chatRoom.getCompany().getId())
+        .businessAccountId(chatRoom.getBusinessAccount().getId())
+        .personalAccountId(chatRoom.getPersonalAccount().getId())
+        .unreadCount(unreadCount)
         .build();
   }
 
   /**
-   * ChatRoomDTO → ChatRoom Entity 변환
+   * 채팅 메시지 수신 시 채팅방 정보를 DTO로 변환
+   * (businessAccountId, personalAccountId, companyId만 필요)
    */
-  public ChatRoom toEntity(Company company, Account businessAccount, Account personalAccount, Resume resume) {
-    return ChatRoom.builder()
-        .company(company)
-        .businessAccount(businessAccount)
-        .personalAccount(personalAccount)
-        .resume(resume)
-        .status(ChatRoom.Status.OPEN)
+  public static ChatRoomDTO fromMessageDTO(ChatMessageDTO messageDTO) {
+    return ChatRoomDTO.builder()
+        .companyId(messageDTO.getCompanyId())
+        .businessAccountId(messageDTO.getBusinessAccountId())
+        .personalAccountId(messageDTO.getSenderId())
         .build();
   }
 }
