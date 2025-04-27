@@ -7,6 +7,7 @@ import com.highfive.meetu.domain.coverletter.common.repository.CoverLetterConten
 import com.highfive.meetu.domain.coverletter.common.repository.CoverLetterRepository;
 import com.highfive.meetu.domain.coverletter.personal.dto.CoachingRequestDTO;
 import com.highfive.meetu.domain.coverletter.personal.dto.CoachingResponseDTO;
+import com.highfive.meetu.global.common.exception.BadRequestException;
 import com.highfive.meetu.global.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -30,6 +32,27 @@ public class CoachingService {
     // application-secret.yml에서 주입받은 FastAPI 엔드포인트 URL
     @Value("${ai.service-url}")
     private String aiServiceUrl;
+
+
+    /**
+     * 메인 메뉴용 가벼운 AI 코칭 요청 (DB 저장 없이)
+     */
+    public CoachingResponseDTO getSimpleCoaching(String sectionTitle, String content) {
+        // 요청 DTO 생성
+        CoachingRequestDTO request = CoachingRequestDTO.builder()
+                .sectionTitle(sectionTitle)
+                .content(content)
+                .build();
+
+        // FastAPI 서버로 POST 요청
+        return webClient.post()
+                .uri(aiServiceUrl + "/coaching")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(CoachingResponseDTO.class)
+                .block();
+    }
+
 
     /**
      * FastAPI로 AI 코칭 요청을 보내고 응답을 받아 db에 저장하는 메서드
@@ -92,7 +115,7 @@ public class CoachingService {
 
         // 피드백이 해당 항목의 것인지 확인
         if (!feedback.getContent().getId().equals(contentId)) {
-            throw new IllegalArgumentException("해당 자기소개서 항목의 피드백이 아닙니다.");
+            throw new BadRequestException("해당 자기소개서 항목의 피드백이 아닙니다.");
         }
 
         // 피드백 내용을 자기소개서 항목에 적용
