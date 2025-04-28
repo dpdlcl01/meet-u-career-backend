@@ -1,59 +1,37 @@
 package com.highfive.meetu.domain.chat.personal.dto;
 
 import com.highfive.meetu.domain.chat.common.entity.ChatMessage;
-import com.highfive.meetu.domain.chat.common.entity.ChatRoom;
-import com.highfive.meetu.domain.user.common.entity.Account;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ChatMessageDTO {
-
-  private String roomId;
+  private Long id;
+  private Long roomId;
   private Long senderId;
-  private String senderName;
   private Integer senderType;
+  private String senderName;
   private String message;
-  private String type; // "TALK", "ENTER", "LEAVE"
-
-  // 🔽 ChatRoom 생성을 위한 정보들
+  private Integer isRead;
+  private String type;
   private Long companyId;
   private Long businessAccountId;
   private Long personalAccountId;
   private Long resumeId;
 
-  private Integer isRead; // ✅ 추가
-
-  /**
-   * DTO → Entity 변환
-   */
-  public ChatMessage toEntity(ChatRoom chatRoom, Account sender) {
-    return ChatMessage.builder()
-        .chatRoom(chatRoom)
-        .sender(sender)
-        .senderType(this.senderType)
-        .message(this.message)
-        .isRead(ChatMessage.ReadStatus.UNREAD)
-        .build();
-  }
-
-  /**
-   * Entity → DTO 변환
-   */
-  public static ChatMessageDTO from(ChatMessage entity) {
+  public static ChatMessageDTO fromEntity(ChatMessage entity) {
     return ChatMessageDTO.builder()
-        .roomId(entity.getChatRoom().getId().toString())
+        .id(entity.getId())
+        .roomId(entity.getChatRoom().getId())
         .senderId(entity.getSender().getId())
-        .senderName(entity.getSender().getName())
         .senderType(entity.getSenderType())
         .message(entity.getMessage())
-        .type("TALK") // 기본은 TALK
-        .isRead(entity.getIsRead()) // ✅ 추가
+        .isRead(entity.getIsRead())
         .build();
   }
 }

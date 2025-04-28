@@ -3,46 +3,40 @@ package com.highfive.meetu.domain.chat.personal.dto;
 import com.highfive.meetu.domain.chat.common.entity.ChatRoom;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 🔥 채팅방 조회용 DTO
- */
-@Getter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ChatRoomDTO {
+  private Long id;
+  private Long companyId;
+  private Long businessAccountId;
+  private Long personalAccountId;
+  private Long resumeId;
+  private Integer status;
 
-  private Long id;                 // 채팅방 ID
-  private Long companyId;           // 기업 ID
-  private Long businessAccountId;   // 기업 계정 ID
-  private Long personalAccountId;   // 개인 계정 ID
-  private int unreadCount;          // 안 읽은 메시지 수
-
-  /**
-   * ChatRoom 엔티티를 DTO로 변환 + 안읽은 메시지 수 포함
-   */
-  public static ChatRoomDTO from(ChatRoom chatRoom, int unreadCount) {
+  public static ChatRoomDTO fromEntity(ChatRoom entity) {
     return ChatRoomDTO.builder()
-        .id(chatRoom.getId())
-        .companyId(chatRoom.getCompany().getId())
-        .businessAccountId(chatRoom.getBusinessAccount().getId())
-        .personalAccountId(chatRoom.getPersonalAccount().getId())
-        .unreadCount(unreadCount)
+        .id(entity.getId())
+        .companyId(entity.getCompany().getId())
+        .businessAccountId(entity.getBusinessAccount().getId())
+        .personalAccountId(entity.getPersonalAccount().getId())
+        .resumeId(entity.getResume() != null ? entity.getResume().getId() : null)
+        .status(entity.getStatus())
         .build();
   }
 
-  /**
-   * 채팅 메시지 수신 시 채팅방 정보를 DTO로 변환
-   * (businessAccountId, personalAccountId, companyId만 필요)
-   */
-  public static ChatRoomDTO fromMessageDTO(ChatMessageDTO messageDTO) {
+  public static ChatRoomDTO fromMessageDTO(ChatMessageDTO dto) {
     return ChatRoomDTO.builder()
-        .companyId(messageDTO.getCompanyId())
-        .businessAccountId(messageDTO.getBusinessAccountId())
-        .personalAccountId(messageDTO.getSenderId())
+        .id(dto.getRoomId())
+        .companyId(dto.getCompanyId())
+        .businessAccountId(dto.getBusinessAccountId())
+        .personalAccountId(dto.getPersonalAccountId())
+        .resumeId(dto.getResumeId())
+        .status(0)
         .build();
   }
 }

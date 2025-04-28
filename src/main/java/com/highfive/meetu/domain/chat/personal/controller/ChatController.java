@@ -1,3 +1,4 @@
+// ChatController.java
 package com.highfive.meetu.domain.chat.personal.controller;
 
 import com.highfive.meetu.domain.chat.personal.dto.ChatMessageDTO;
@@ -22,9 +23,6 @@ public class ChatController {
   private final ChatMessageService chatMessageService;
   private final SimpMessageSendingOperations messagingTemplate;
 
-  /**
-   * 🔥 내 채팅방 목록 조회 (accountId 기준)
-   */
   @GetMapping("/rooms")
   public ResultData<List<ChatRoomDTO>> getMyChatRooms() {
     Long accountId = SecurityUtil.getAccountId();
@@ -32,29 +30,24 @@ public class ChatController {
     return ResultData.success(rooms.size(), rooms);
   }
 
-  /**
-   * 🔥 클라이언트로부터 채팅 메시지를 수신하면 채팅방 생성 및 메시지 처리
-   */
+  @GetMapping("/rooms/{roomId}/messages")
+  public ResultData<List<ChatMessageDTO>> getMessages(@PathVariable Long roomId) {
+    List<ChatMessageDTO> list = chatMessageService.getMessagesByRoom(roomId);
+    return ResultData.success(list.size(), list);
+  }
+
   @MessageMapping("/chat/send")
   public void sendMessage(ChatMessageDTO dto) {
-    // ✅ 채팅방이 존재하지 않으면 생성
-    ChatRoomDTO chatRoomDTO = ChatRoomDTO.fromMessageDTO(dto);
-    chatRoomService.findOrCreateRoom(chatRoomDTO);
+    chatRoomService.findOrCreateRoom(ChatRoomDTO.fromMessageDTO(dto));
 
-    // 💬 메시지 타입 분기 처리
-    switch (dto.getType()) {
-      case "ENTER":
-        dto.setMessage(dto.getSenderName() + "님이 입장하셨습니다.");
-        break;
-      case "LEAVE":
-        dto.setMessage(dto.getSenderName() + "님이 퇴장하셨습니다.");
-        break;
-      case "TALK":
-        chatMessageService.saveMessage(dto);
-        break;
+    if ("ENTER".equals(dto.getType())) {
+      dto.setMessage(dto.getSenderName() + "님이 입장하셨습니다.");
+    } else if ("LEAVE".equals(dto.getType())) {
+      dto.setMessage(dto.getSenderName() + "님이 퇴장하셨습니다.");
+    } else if ("TALK".equals(dto.getType())) {
+      chatMessageService.saveMessage(dto);
     }
 
-    // 📤 채팅방 구독자들에게 메시지 전송
-    messagingTemplate.convertAndSend("/sub/chat/" + dto.getRoomId(), dto);
+    messagingTemplate.convertAndSend("/sub/chat/room/" + dto.getRoomId(), dto);
   }
 }

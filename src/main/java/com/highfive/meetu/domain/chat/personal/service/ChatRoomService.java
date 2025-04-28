@@ -2,62 +2,67 @@ package com.highfive.meetu.domain.chat.personal.service;
 
 import com.highfive.meetu.domain.chat.common.entity.ChatRoom;
 import com.highfive.meetu.domain.chat.common.repository.ChatRoomRepository;
-import com.highfive.meetu.domain.chat.common.repository.ChatMessageRepository;
 import com.highfive.meetu.domain.chat.personal.dto.ChatRoomDTO;
 import com.highfive.meetu.domain.company.common.entity.Company;
 import com.highfive.meetu.domain.company.common.repository.CompanyRepository;
+import com.highfive.meetu.domain.resume.common.entity.Resume;
+import com.highfive.meetu.domain.resume.common.repository.ResumeRepository;
 import com.highfive.meetu.domain.user.common.entity.Account;
 import com.highfive.meetu.domain.user.common.repository.AccountRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ChatRoomService {
 
   private final ChatRoomRepository chatRoomRepository;
-  private final ChatMessageRepository chatMessageRepository;
   private final CompanyRepository companyRepository;
   private final AccountRepository accountRepository;
+  private final ResumeRepository resumeRepository;
 
-  /**
-   * 🔥 내 채팅방 목록 조회 (accountId 기준)
-   */
-  public List<ChatRoomDTO> findMyChatRooms(Long accountId) {
-    List<ChatRoom> rooms = chatRoomRepository.findByBusinessAccountIdOrPersonalAccountId(accountId, accountId);
+  /** 🔥 채팅방 생성 (DTO -> Entity 변환) */
+  public Long createRoom(ChatRoomDTO dto) {
+    Company company = companyRepository.findById(dto.getCompanyId()).orElseThrow();
+    Account businessAccount = accountRepository.findById(dto.getBusinessAccountId()).orElseThrow();
+    Account personalAccount = accountRepository.findById(dto.getPersonalAccountId()).orElseThrow();
+    Resume resume = dto.getResumeId() != null ? resumeRepository.findById(dto.getResumeId()).orElse(null) : null;
 
-    return rooms.stream()
-        .map(room -> {
-          int unreadCount = chatMessageRepository.countByChatRoomIdAndIsReadAndSenderIdNot(
-              room.getId(), 0, accountId
-          );
-          return ChatRoomDTO.from(room, unreadCount);
-        })
-        .collect(Collectors.toList());
+    ChatRoom room = ChatRoom.builder()
+        .company(company)
+        .businessAccount(businessAccount)
+        .personalAccount(personalAccount)
+        .resume(resume)
+        .status(ChatRoom.Status.OPEN)
+        .build();
+    return chatRoomRepository.save(room).getId();
   }
 
-  /**
-   * 🔥 채팅방이 존재하지 않으면 생성
-   */
-  public ChatRoom findOrCreateRoom(ChatRoomDTO dto) {
-    return chatRoomRepository.findByBusinessAccountIdAndPersonalAccountId(dto.getBusinessAccountId(), dto.getPersonalAccountId())
-        .orElseGet(() -> {
-          Company company = companyRepository.findById(dto.getCompanyId())
-              .orElseThrow(() -> new IllegalArgumentException("회사를 찾을 수 없습니다."));
-          Account businessAccount = accountRepository.findById(dto.getBusinessAccountId())
-              .orElseThrow(() -> new IllegalArgumentException("기업 계정을 찾을 수 없습니다."));
-          Account personalAccount = accountRepository.findById(dto.getPersonalAccountId())
-              .orElseThrow(() -> new IllegalArgumentException("개인 계정을 찾을 수 없습니다."));
+  /** 🔥 내 채팅방 목록 조회 */
+  public List<ChatRoomDTO> findMyChatRooms(Long accountId) {
+    List<ChatRoom> rooms = chatRoomRepository.findMyRooms(accountId);
+    return rooms.stream().map(ChatRoomDTO::fromEntity).collect(Collectors.toList());
+  }
 
-          return chatRoomRepository.save(ChatRoom.builder()
-              .company(company)
-              .businessAccount(businessAccount)
-              .personalAccount(personalAccount)
-              .status(0)
-              .build());
-        });
+  /** 🔥 채팅방 찾거나 없으면 생성 */
+  public Long findOrCreateRoom(ChatRoomDTO dto) {
+    Optional<ChatRoom> optionalRoom = chatRoomRepository.findRoom(
+        dto.getCompanyId(),
+        dto.getBusinessAccountId(),
+        dto.getPersonalAccountId(),
+        dto.getResumeId()
+    );
+
+    if (optionalRoom.isPresent()) {
+      return optionalRoom.get().getId();
+    } else {
+      return createRoom(dto);
+    }
   }
 }
