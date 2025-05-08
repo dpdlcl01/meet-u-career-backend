@@ -86,4 +86,13 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
         FROM company c
     """)
     long countParticipatingCompanies();
+
+    /**
+     * 활성(ACTIVE) 상태인 회사만 조회
+     *
+     * @param id 회사 ID
+     * @param status Company.Status.ACTIVE
+     * @return Optional<Company>
+     */
+    Optional<Company> findByIdAndStatus(Long id, Integer status);
 }

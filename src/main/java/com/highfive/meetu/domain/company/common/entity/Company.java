@@ -71,7 +71,7 @@ public class Company extends BaseEntity {
     private String companyType;  // 기업 형태 (예: 대기업 등)
 
     @Column(length = 50)
-    private String corpcode;  // API 연동용 기업 코드
+    private String corpCode;  // API 연동용 기업 코드
 
     @Column
     private Long operatingProfit;  // 최근 연도 영업이익
@@ -82,6 +82,9 @@ public class Company extends BaseEntity {
 
     @Column(nullable = false)
     private Integer status;  // 기업 상태 (ACTIVE, INACTIVE)
+
+    @Column
+    private Long avgAnnualSalary;   // 평균연봉
 
     @BatchSize(size = 20)
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)

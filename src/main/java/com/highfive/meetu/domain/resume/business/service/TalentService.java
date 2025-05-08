@@ -23,6 +23,15 @@ import java.util.stream.Collectors;
 public class TalentService {
     private final TalentRepository talentRepository;
 
+
+    /*
+        If 경력 null >> show 신입
+
+        when company clicks on resume. add view count.
+     */
+
+
+
     /**
      * 대표 이력서를 조회하여 응답 DTO 리스트를 반환
      * 

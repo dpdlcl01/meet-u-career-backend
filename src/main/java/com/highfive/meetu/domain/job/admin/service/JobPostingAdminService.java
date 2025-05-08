@@ -76,7 +76,8 @@ public class JobPostingAdminService {
                     + "&keywords=" + encodedKeyword
                     + "&output=json"
                     + "&fields=count"  // read-cnt, apply-cnt 포함
-                    + "&count=100";     // 10개 출력
+                    + "&count=10";     // 10개 출력
+            // 문성후 테스트 10
 
             URL url = new URL(apiUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -218,7 +219,14 @@ public class JobPostingAdminService {
                         .numEmployees(firstItem.path("enpEmpeCnt").asInt())
                         .revenue(0L)
                         .website(firstItem.path("enpHmpgUrl").asText())
+
+                /*
+                /      문성후 테스트: 법인등록번호 >> logoKey, 평균연봉 >> avgAnnualSalary
+                */
                         .logoKey(null)
+                        .logoKey(firstItem.path("crno").asText())
+                        .avgAnnualSalary((long) firstItem.path("avgSalary").asDouble())
+
                         .address(firstItem.path("enpBsadr").asText())
                         .updatedAt(LocalDateTime.now())
                         .status(Company.Status.ACTIVE)
