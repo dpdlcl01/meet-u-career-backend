@@ -5,5 +5,9 @@ RUN chmod +x gradlew && ./gradlew clean build -x test --no-daemon
 
 FROM openjdk:17
 WORKDIR /app
+
+# 프로파일을 prod로 설정
+ENV SPRING_PROFILES_ACTIVE=prod
+
 COPY --from=builder /app/build/libs/meet-u-backend-0.0.1-SNAPSHOT.jar /app/meet-u-backend.jar
 ENTRYPOINT ["java", "-jar", "/app/meet-u-backend.jar"]

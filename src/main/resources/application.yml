@@ -19,10 +19,6 @@ spring:
         show_sql: true         # 콘솔에 실행되는 SQL 출력
         format_sql: true       # SQL을 보기 좋게 정렬
         use_sql_comments: true # SQL에 주석을 추가하여 JPA 동작 설명
-  data:
-    redis:
-      host: localhost          # 배포 환경에서는 redis (docker-compose.yml 안에 정의된 redis 컨테이너의 이름)
-      port: 6379
 
   mail:
     host: smtp.gmail.com

@@ -1,2 +1,21 @@
+## 개발 환경 설정 파일
+server:
+  port: 8080  # 애플리케이션이 실행될 포트 (개발 환경에서는 일반적으로 8080 포트 사용)
+spring:
+  output:
+    ansi:
+      enabled: always
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: redis   # Docker Compose 내 Redis 컨테이너 이름
+      port: 6379
+
+custom:
+  fileDirPath: /usr/work  # 애플리케이션에서 사용하는 파일 저장 경로 (파일 업로드 등 관련 경로 설정)
+
 jwt: # token
   cookie-secure: true

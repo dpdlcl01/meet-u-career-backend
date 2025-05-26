@@ -5,8 +5,15 @@ spring:
   output:
     ansi:
       enabled: always
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 custom:
   fileDirPath: /usr/work  # 애플리케이션에서 사용하는 파일 저장 경로 (파일 업로드 등 관련 경로 설정)
 
