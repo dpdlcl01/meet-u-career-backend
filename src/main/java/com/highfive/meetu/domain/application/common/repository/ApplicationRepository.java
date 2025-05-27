@@ -108,8 +108,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Long>,
             END AS ageGroup,
             COUNT(a.id)
         FROM application a
-        JOIN profile p ON a.profile_id = p.id
-        JOIN account acc ON p.account_id = acc.id
+        JOIN profile p ON a.profileId = p.id
+        JOIN account acc ON p.accountId = acc.id
         GROUP BY ageGroup
         ORDER BY FIELD(ageGroup, '10대', '20대', '30대', '40대', '50대', '60대 이상', '기타')
     """, nativeQuery = true)
